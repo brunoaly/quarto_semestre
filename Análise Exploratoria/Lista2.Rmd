@@ -1,0 +1,79 @@
+---
+title: "Lista2"
+author: "Bruno Aly"
+date: "2024-04-09"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+##Lista 2 - Segmentação
+
+1) Um diretor de uma instituição financeira que presta serviços para agências bancárias em Barueri deseja agrupar os municípios abaixo de acordo com a quantidade de agências e o valor do caixa dentro de cada município.
+
+```{r, include = FALSE}
+library(readxl)
+dados1 = read_excel('Lista2.xlsx', sheet = "Ex1")
+Ex1 = data.frame(dados1[1:3], row.names = 1)
+Ex1 = scale(Ex1)
+```
+
+
+a) Considerando as variáveis acima, obtenha a matriz de distância (calcular a distância Euclidiana). Apresente-a.
+
+```{r}
+distancia = dist(Ex1)
+options(digits = 2)
+distancia
+```
+
+A matriz mostra que Gauraulhos é mais parecido com Santo André; e Brarueri com São Bernardo do Campo.
+
+b) Qual o local mais parecido com Barueri para se abrir uma filial da instituição financeira?
+
+```{r, echo=FALSE, warning=FALSE}
+library(leaflet)
+
+mapa <- leaflet() %>% 
+      addTiles() %>%
+  addMarkers(
+    lng= dados1$Longitude, 
+    lat= dados1$Latitude, 
+    popup=c("Matriz",
+            "Descartar essa cidade",
+            "Possível Filial",
+            "Descartar"))
+mapa
+
+```
+
+2) Um recrutador de RH deseja agrupar os candidatos a uma determinada vaga em três grupos considerando duas variáveis: o tempo de formação do candidato e o tempo que o candidato permaneceu na empresa anterior. A Tabela apresenta os valores das variáveis para os cinco candidatos que investiram uma candidatura.
+
+```{r}
+dados2 = read_excel('Lista2.xlsx', sheet = "Ex2")
+Ex2 = dados2[-1]
+Ex2 = scale(Ex2)
+```
+
+a) Agrupe-os em três grupos e trace o perfil de cada grupo.
+
+```{r, echo=FALSE, warning=FALSE}
+distancia = dist(Ex2)
+h = hclust(distancia, method = "complete")
+plot(h, ylab='distância')
+rect.hclust(h,3)
+```
+
+Cluster 1 (Candidatos 3 e 4): mais tempo de formação e passaram praticamente o mesmo tempo na mesma empresa - grupo Fiéis
+
+Cluster 2 (Candidato 5): formado há bastante tempo, mas ainda está em busca de novas oportunidades - grupo dos "Em busca da felicidade"
+
+Cluster 3 (Candidato 1 e 2): formado há pouco tempo e em busca de novas oportunidades - grupos dos juniores.
+
+3) Um técnico ajustou uma análise de cluster para separar jogadores de futebol,
+integrantes dos melhores clubes e seleções do mundo, em grupos. Essa avaliação levou em conta a idade dos jogadores, valor de mercado e salário de 2019, e algumas avaliações como reputação internacional e classificação geral e potencial (escores)
+
+a) Ibrahimovic
+
+b)

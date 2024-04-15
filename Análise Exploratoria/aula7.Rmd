@@ -1,0 +1,87 @@
+---
+title: "FlexDashboard"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(tidyverse)
+library(ggplot2)
+library(gridExtra)
+dados <- read_delim( "https://www.stat.ubc.ca/~jenny/notOcto/STAT545A/examples/gapminder/data/gapminderDataFiveYear.txt", delim = "\t")
+dados1 = filter(dados, year == 2007 )
+```
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Grid {data-height=900}
+
+
+```{r, echo = FALSE}
+tabela = table(dados1$continent)
+tabela = data.frame(tabela)
+degrade = colorRampPalette(c("darkblue", "lightblue"))
+
+graf1 <- ggplot(tabela, aes(x="",
+                            y= Freq,
+                            fill = Var1))+
+  geom_bar(stat="identity", width = 1)+
+  scale_fill_manual(values=degrade(nrow(tabela)))+
+  coord_polar("y",start = 0) +
+  labs(fill="",
+       x="",
+       y="")
+ 
+graf2 <- ggplot(tabela, aes(x=reorder(Var1,Freq), y=Freq,fill = reorder(Var1,Freq)))+
+  geom_bar(stat="identity")+
+  scale_fill_brewer(palette = "Blues")+
+  labs(x="Continentes",y="Quantidade de países")+
+  guides(fill=FALSE)
+
+grid.arrange(graf1, graf2, nrow = 1)
+
+```
+
+### Documentação da base {data-height=100}
+
+Esses dados são provenientes da universidade de British Columbia no Canadá, o projeto se chama Gap Minder
+
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Dispersão
+
+```{r}
+ggplot(dados1, aes(x = gdpPercap,
+                   y = lifeExp,
+                   color = continent)) +
+  geom_point(alpha = 0.55, size = 2.5) +
+  labs(title = "PIB x Expectativa de vida",
+       subtitle = "Gap Minder 2007",
+       x="PIB per capita",
+       y="Expectativa de vida",
+       color = "") +
+  theme_minimal()
+```
+
+### Boxplot
+
+```{r}
+ggplot(dados1, aes(x = continent,
+                   y = log(pop),
+                  fill = continent)) +
+  geom_boxplot() +
+  scale_fill_brewer("Blues") +
+  labs(title = "População x Continente",
+       subtitle = "Gap Minder 2007",
+       x="Continente",
+       y="Log(População)")  +
+  guides(fill = "none") +
+  theme_minimal()
+```
+

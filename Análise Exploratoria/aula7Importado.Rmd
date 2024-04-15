@@ -1,0 +1,81 @@
+---
+title: "ggplot2 Brushing"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    social: menu
+    source_code: embed
+runtime: shiny
+---
+
+```{r global, include=FALSE}
+# load data in 'global' chunk so it can be shared by all users of the dashboard
+library(flexdashboard)
+library(tidyverse)
+library(ggplot2)
+library(gridExtra)
+dados <- read_delim( "https://www.stat.ubc.ca/~jenny/notOcto/STAT545A/examples/gapminder/data/gapminderDataFiveYear.txt", delim = "\t")
+dados1 = filter(dados, year == 2007 )
+dados2 <- dados1[, -2]
+```
+
+
+```{r}
+# Reactive that returns the whole dataset if there is no brush
+selectedData <- reactive({
+  data <- brushedPoints(dados2, input$plot_brush)
+  if (nrow(data) == 0)
+    data <- dados2
+  data
+})
+```
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Pib por expectativa {data-width=600}
+
+```{r}
+library(ggplot2)
+renderPlot({
+  ggplot(dados1, aes(x = gdpPercap,
+                   y = lifeExp,
+                   color = continent)) +
+  geom_point(alpha = 0.55, size = 2.5) +
+  labs(title = "PIB x Expectativa de vida",
+       subtitle = "Gap Minder 2007",
+       x="PIB per capita",
+       y="Expectativa de vida",
+       color = "") +
+  theme_minimal()
+}, outputArgs = list(brush = brushOpts(id = "plot_brush")))
+```
+
+### População por continente
+
+```{r}
+renderPlot({
+  ggplot(selectedData(), aes(x = continent,
+                   y = log(pop),
+                  fill = continent)) +
+  geom_boxplot() +
+  scale_fill_brewer("Blues") +
+  labs(title = "População x Continente",
+       subtitle = "Gap Minder 2007",
+       x="Continente",
+       y="Log(População)")  +
+  guides(fill = "none") +
+  theme_minimal()
+})
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Detalhes dos países {data-width=400}
+
+```{r}
+renderTable({
+  selectedData()
+})
+```

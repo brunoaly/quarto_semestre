@@ -1,0 +1,76 @@
+---
+title: "Dashboard"
+author: "Bruno Aly, João Caldas, Luiz Guilherme Machado, Gabriel Terruya"
+date: "2024-03-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r}
+library(shiny)
+library(ggplot2)
+
+
+ui <- fluidPage(
+  
+
+  titlePanel("Exercício em Grupo 2"),
+  
+
+  fluidRow(
+  
+    tabsetPanel(
+      tabPanel("Tela Inicial", 
+               p("Esse é um dashboard que apresentará todos os gráficos feitos nesse exercício.")
+      ),
+      tabPanel("A)",
+               p("Gráfico de Barras"),
+               plotOutput("barplot")
+      ),
+      tabPanel("B)",
+               p("Diagrama de Dispersão"),
+               plotOutput("scatterplot")
+      ),
+      tabPanel("C)",
+               p("Boxplot"),
+               plotOutput("boxplot")
+      )
+    )
+  )
+)
+
+server <- function(input, output) {
+  
+  set.seed(123)
+  df <- data.frame(
+    Categoria = sample(LETTERS[1:5], 100, replace = TRUE),
+    Variavel1 = rnorm(100),
+    Variavel2 = rnorm(100)
+  )
+  
+  output$barplot <- renderPlot({
+    ggplot(df, aes(x = Categoria)) +
+      geom_bar() +
+      labs(title = "Gráfico de Barras", x = "Categoria", y = "Contagem")
+  })
+  
+  output$scatterplot <- renderPlot({
+    ggplot(df, aes(x = Variavel1, y = Variavel2)) +
+      geom_point() +
+      labs(title = "Diagrama de Dispersão", x = "Variável 1", y = "Variável 2")
+  })
+  
+  output$boxplot <- renderPlot({
+    ggplot(df, aes(x = Categoria, y = Variavel1)) +
+      geom_boxplot() +
+      labs(title = "Boxplot", x = "Categoria", y = "Variável 1")
+  })
+  
+}
+
+shinyApp(ui = ui, server = server)
+```
+

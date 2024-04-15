@@ -1,0 +1,100 @@
+---
+title: "aula6"
+author: "João Caldas"
+date: "2024-02-29"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Gráficos com o pacote GGPLOT2
+
+```{r, include=FALSE}
+setwd("C:/Users/joao.caldas/Desktop/Análise Exploratoria")
+library(tidyverse)
+library(ggplot2)
+library(gridExtra)
+dados <- read_delim( "https://www.stat.ubc.ca/~jenny/notOcto/STAT545A/examples/gapminder/data/gapminderDataFiveYear.txt", delim = "\t")
+
+dados1 = filter(dados, year == 2007 )
+```
+Hoje, vamos aprender a construir gráficos com o Grammar of Graphics(GGPLOT2).
+
+São necessários 3 elementos: dados, mapeamento das coordenadas(aesthetic) e a geometria (o tipo do gráfico).
+
+### Gráfico de barras/colunas
+
+```{r}
+ggplot(dados1, aes(x = continent, fill = continent)) +
+  geom_bar() + 
+  scale_fill_brewer(palette = "Reds") +
+  guides(fill = "none") +
+  labs(title = "Países por continentes",
+       subtitle = "Gap Minder 2007",
+       x="",
+       y="quantidade de países") +
+  theme_minimal()
+```
+
+### Gráfico de dispersão
+
+```{r}
+ggplot(dados1, aes(x = gdpPercap,
+                   y = lifeExp,
+                   color = continent)) +
+  geom_point(alpha = 0.55, size = 2.5) +
+  labs(title = "PIB x Expectativa de vida",
+       subtitle = "Gap Minder 2007",
+       x="PIB per capita",
+       y="Expectativa de vida",
+       color = "") +
+  theme_minimal()
+  
+```
+
+### Diagrama de caixa(boxplot)
+
+```{r}
+ggplot(dados1, aes(x = continent,
+                   y = log(pop),
+                  fill = continent)) +
+  geom_boxplot() +
+  scale_fill_brewer("Blues") +
+  labs(title = "População x Continente",
+       subtitle = "Gap Minder 2007",
+       x="Continente",
+       y="Log(População)")  +
+  guides(fill = "none") +
+  theme_minimal()
+```
+
+### Grade com gráficos
+
+```{r, echo = false}
+tabela = table(dados1$continent)
+tabela = data.frame(tabela)
+degrade = colorRampPalette(c("darkblue", "lightblue"))
+
+graf1 <- ggplot(tabela, aes(x="",
+                            y= Freq,
+                            fill = Var1))+
+  geom_bar(stat="identity", width = 1)+
+  scale_fill_manual(values=degrade(nrow(tabela)))+
+  coord_polar("y",start = 0) +
+  labs(fill="",
+       x="",
+       y="")
+ 
+graf2 <- ggplot(tabela, aes(x=reorder(Var1,Freq), y=Freq,fill = reorder(Var1,Freq)))+
+  geom_bar(stat="identity")+
+  scale_fill_brewer(palette = "Blues")+
+  labs(x="Continentes",y="Quantidade de países")+
+  guides(fill=FALSE)
+
+grid.arrange(graf1, graf2, nrow = 1)
+
+```
+
+

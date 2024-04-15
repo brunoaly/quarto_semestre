@@ -1,0 +1,61 @@
+---
+title: "aula4"
+author: "João Caldas"
+date: "2024-02-22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Manipulação de dados
+
+```{r, message=FALSE, echo=FALSE}
+  library(tidyverse)
+  dados = read_csv("cces_sample.csv")
+
+
+```
+
+```{r}
+dados5 = dados%>%
+  drop_na()%>%
+  filter(region == 4)%>%
+  select("edloan", "employ", "gender")%>%
+  arrange(edloan, employ)
+head(dados5, n=7)
+```
+Outra função útil é a recode.
+
+**Exercício 1:** Recodifique a variável region, de acordo com o codebook e apresente as 4 primeiras colunas do objeto e as 10 primeiras linhas, sem alterar o objeto dados.       
+
+```{r}
+
+dadosEx1 = dados
+
+dadosNovos = recode(dadosEx1$region, 
+                    `1` = "Northwest",
+                   `2`= "Midwest",
+                    `3` = "South",
+                    `4` = "West")
+dadosEx1$region = dadosNovos
+
+head(dadosEx1[1:4])
+
+```
+
+**Exercício 2:** Agrupe os dados por região e gere um resumo estatístico da variável escolaridade e ideologia(média)
+
+```{r}
+dadosEx2 = dadosEx1%>%
+  group_by(region)%>%
+  summarise(media_ideologia = mean(ideo5), media_escolaridade = mean(educ))
+
+dadosEx2
+ 
+knitr:: kable(dadosEx2)
+  
+
+```
+
